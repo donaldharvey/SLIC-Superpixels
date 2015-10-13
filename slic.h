@@ -68,9 +68,12 @@ class Slic {
         void generate_superpixels(IplImage *image, int step, int nc);
         /* Enforce connectivity for an image. */
         void create_connectivity(IplImage *image);
+
+        vec2di *get_clusters();
         
         /* Draw functions. Resp. displayal of the centers and the contours. */
         void display_center_grid(IplImage *image, CvScalar colour);
+        vector<CvPoint> *generate_contours(IplImage *image);
         void display_contours(IplImage *image, CvScalar colour);
         void colour_with_cluster_means(IplImage *image);
 };

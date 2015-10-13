@@ -294,15 +294,16 @@ void Slic::display_center_grid(IplImage *image, CvScalar colour) {
  * Input : The target image (IplImage*) and contour colour (CvScalar).
  * Output: -
  */
-void Slic::display_contours(IplImage *image, CvScalar colour) {
+
+vector<CvPoint> *Slic::generate_contours(IplImage *image) {
     const int dx8[8] = {-1, -1,  0,  1, 1, 1, 0, -1};
-	const int dy8[8] = { 0, -1, -1, -1, 0, 1, 1,  1};
-	
-	/* Initialize the contour vector and the matrix detailing whether a pixel
-	 * is already taken to be a contour. */
-	vector<CvPoint> contours;
-	vec2db istaken;
-	for (int i = 0; i < image->width; i++) { 
+    const int dy8[8] = { 0, -1, -1, -1, 0, 1, 1,  1};
+    
+    /* Initialize the contour vector and the matrix detailing whether a pixel
+     * is already taken to be a contour. */
+    vector<CvPoint> *contours = new vector<CvPoint>;
+    vec2db istaken;
+    for (int i = 0; i < image->width; i++) { 
         vector<bool> nb;
         for (int j = 0; j < image->height; j++) {
             nb.push_back(false);
@@ -328,16 +329,24 @@ void Slic::display_contours(IplImage *image, CvScalar colour) {
             
             /* Add the pixel to the contour list if desired. */
             if (nr_p >= 2) {
-                contours.push_back(cvPoint(i,j));
+                contours->push_back(cvPoint(i,j));
                 istaken[i][j] = true;
             }
         }
     }
-    
+    return contours;
+}
+
+void Slic::display_contours(IplImage *image, CvScalar colour) {
+    vector<CvPoint> *contours = Slic::generate_contours(image);
     /* Draw the contour pixels. */
-    for (int i = 0; i < (int)contours.size(); i++) {
-        cvSet2D(image, contours[i].y, contours[i].x, colour);
+    for (int i = 0; i < (int)contours->size(); i++) {
+        cvSet2D(image, (*contours)[i].y, (*contours)[i].x, colour);
     }
+}
+
+vec2di* Slic::get_clusters() {
+    return &clusters;
 }
 
 /*
@@ -377,3 +386,5 @@ void Slic::colour_with_cluster_means(IplImage *image) {
         }
     }
 }
+
+
